@@ -19,4 +19,4 @@ iCloud Drive/
 
 
 ### Preview
-![preview](https://github.com/MajedPro/FlexpoolWidget/blob/main/preview.png)
+![preview](https://github.com/MajedPro/FlexpoolWidget/blob/main/preview.jpg)
