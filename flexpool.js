@@ -2,20 +2,20 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: brown; icon-glyph: angle-double-up;
 
-const address = '0x4368d11f47764B3912127B70e8647Dd031955A7C'; // Flexpool miner address
+const address = '0x709303b9E7E95C59920BC9C41Be4CD40377801C7'; // Flexpool miner address
 
-const baseFlexpoolUrl = "https://flexpool.io/api/v1";
-const balanceURL = `${baseFlexpoolUrl}/miner/${address}/balance`;
-const hashURL = `${baseFlexpoolUrl}/miner/${address}/current`;
-const poolHashURl = `${baseFlexpoolUrl}/pool/hashrate`;
-const poolLuckURL = `${baseFlexpoolUrl}/pool/currentLuck`;
-const workerCountUrl =`${baseFlexpoolUrl}/miner/${address}/workerCount`;
-const estimatedURL = `${baseFlexpoolUrl}/miner/${address}/estimatedDailyRevenue`;
-const roundShareUrl = `${baseFlexpoolUrl}/miner/${address}/roundShare`;
+const baseFlexpoolUrl = "https://api.flexpool.io/v2";
+const balanceURL = `${baseFlexpoolUrl}/miner/balance?coin=ETH&address=${address}`;
+const hashURL = `${baseFlexpoolUrl}/miner/stats?coin=ETH&address=${address}`;
+const poolHashURl = `${baseFlexpoolUrl}/pool/hashrate?coin=ETH`;
+const poolLuckURL = `${baseFlexpoolUrl}/pool/currentLuck?coin=ETH`;
+const workerCountUrl =`${baseFlexpoolUrl}/miner/workerCount/?coin=ETH&address=${address}`;
+const estimatedURL = `${baseFlexpoolUrl}/pool/dailyRewardPerGigahashSec?coin=eth`;
+const roundShareUrl = `${baseFlexpoolUrl}/miner/roundShare?coin=eth&address=${address}`;
 
 
-let fm = FileManager.iCloud();
-let flexIcon = fm.readImage(fm.documentsDirectory() + "/flexpool.png");
+const fm = new Request('https://raw.githubusercontent.com/MajedPro/FlexpoolWidget/main/flexpool.png')
+const flexIcon = await fm.loadImage()
 
 
 const poolLuckData = new Request(poolLuckURL);
@@ -26,7 +26,7 @@ poolLuck = Number(poolLuck).toFixed(2);
 
 const workerCountData = new Request(workerCountUrl);
 const workerCountRes = await workerCountData.loadJSON();
-var workerCount = workerCountRes["result"]["online"];
+var workerCount = workerCountRes["result"]["workersOnline"];
 workerCount = workerCount;
 
 const roundShareData = new Request(roundShareUrl);
@@ -45,22 +45,25 @@ poolHashrate = Number(poolHashrate).toPrecision(3);
 
 const hashData = new Request(hashURL);
 const hashRes = await hashData.loadJSON();
-var hashe = hashRes["result"]["effective_hashrate"];
-var hashr = hashRes["result"]["reported_hashrate"];
+var hashe = hashRes["result"]["currentEffectiveHashrate"];
+var hashr = hashRes["result"]["reportedHashrate"];
+var hasha = hashRes["result"]["averageEffectiveHashrate"]
 hashe = hashe / 1e9;
 hashe = Number(hashe).toPrecision(3);
 hashr = hashr / 1e9;
 hashr = Number(hashr).toPrecision(3);
+hasha = hasha / 1e9;
+hasha = Number(hasha).toPrecision(3);
 
 const estimatedData = new Request(estimatedURL);
 const estimatedRes = await estimatedData.loadJSON();
 var estBalance = estimatedRes["result"];
-estBalance = estBalance / 1e18;
+estBalance = estBalance / 1e18 * hasha;
 estBalance = Number(estBalance).toPrecision(3);
 
 const balanceData = new Request(balanceURL);
 const balanceRes = await balanceData.loadJSON();
-var balance = balanceRes["result"];
+var balance = balanceRes["result"]["balance"];
 balance = balance / 1e18;
 balance = Number(balance).toPrecision(4);
 
@@ -87,6 +90,8 @@ const poolLuckText = widget.addText(String(poolLuck)+' %');
 poolLuckText.textColor = Color.green();
 poolLuckText.font = Font.mediumRoundedSystemFont(8);
 poolLuckText.rightAlignText()
+
+
 
 
 widget.addSpacer(9);
